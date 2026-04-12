@@ -60,7 +60,7 @@ authRouter.post("/refresh", isRefresh, async (req, res) => {
         const {accessToken, refreshToken} = generateTokens(user);   //Genera los tokens
         res.cookie("refresh", refreshToken, {httpOnly: true, secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }); //Guarda el refresh token en una cookie httpOnly para renovar acceso sin exponerlo al cliente
 
-        res.status(200).json({status: "Success", message: "Token renovado", token: accessToken});
+        res.status(200).json({status: "Success", message: "Token de acceso renovado", token: accessToken});
     } catch (error) {
         res.status(500).json({status: "Error", message: "Error interno del servidor"});
     }

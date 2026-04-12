@@ -35,7 +35,7 @@ usersRouter.get("/profile", isAuth, async (req, res) =>{
         //const user = req.session?.userInfo; //Pregunto si ya existe la cookie de conexion del cliente
         //if(!user) return res.status(401).json({status: "Error", message: "Usuario no logueado"});
         //res.status(200).json({status: "Success", message: "Usuario accediendo a contenido privado porque ya esta logueado", payload: user});
-        res.status(200).json({status: "Success", message: "Usuario accediendo a contenido privado porque ya esta logueado"});
+        res.status(200).json({status: "Success", message: "Usuario accediendo a ruta protegida porque ya esta logueado"});
     } catch (error) {
         res.status(500).json({status: "Error", message: "Error interno del servidor"});
     }

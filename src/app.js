@@ -1,25 +1,22 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 //import session from "express-session";
 //import MongoStore from "connect-mongo";
 
+import { env } from "./config/env.js";
 import usersRouter from "./routers/users-router.js";
 import authRouter from "./routers/auth-router.js";
 import connectMongoDB from "./config/db.js";
 
 const app = express();
 
-//Inicializacion de variables de entorno
-dotenv.config();
-
 //Configuracion objeto de session
 /* const sessionConfig = {
     store: MongoStore.create({                  
-        mongoUrl: process.env.URI_MONGODB,      //Guarda las sessions en MongoDB en vez de memoria local del server
+        mongoUrl: env.uriMongoDB,               //Guarda las sessions en MongoDB en vez de memoria local del server
         ttl: 1 * 24 * 60 *60                    //Duracion de la session en la DB en segundos
     }),
-    secret: process.env.SECRET_CODE,            //Clave para firmar la cookie y evitar manipulaciones del lado del cliente
+    secret: env.secretCode,                     //Clave para firmar la cookie y evitar manipulaciones del lado del cliente
     resave: false,                              //False: no guarda la sesion si no hubo cambios, lo que optimiza rendimiento
     saveUninitialized: false         
 }; */
@@ -36,7 +33,6 @@ app.use(express.urlencoded({extended: true}));  //Permite leer datos enviados de
 
 //Cookies
 app.use(cookieParser());
-//app.use(cookieParser(process.env.SECRET_CODE));
 
 //Sessions
 //app.use(session(sessionConfig));              //Session crea una cookie con un id que identifica al cliente
@@ -49,6 +45,6 @@ app.use("/api/auth", authRouter);
 connectMongoDB();
 
 //Server listen
-app.listen(process.env.PORT, ()=>{
+app.listen(env.port, ()=>{
     console.log("Servidor iniciado");
 });
