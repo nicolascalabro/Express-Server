@@ -3,12 +3,17 @@ import passport from "passport";
 
 import User from "../models/user-model.js";
 import { hashPassword, comparePassword } from "../utils/password.js";
-import { isAuth } from "../middlewares/auth-middleware.js";
+import { authorizeRoles } from "../middlewares/auth-middleware.js";
 
 const usersRouter = express.Router();
 
+//Para refactorizar los endopoints
+const authenticate = passport.authenticate("jwt", {session: false});    //Usuario autenticado
+const requireAdmin = [authenticate, authorizeRoles([])];                //Usuario autenticado y con rol admin
+const requireUser = [authenticate, authorizeRoles(["user"])];           //Usuario autenticado y con rol user
+
 //Get all users
-usersRouter.get("/", async (req, res) =>{
+usersRouter.get("/", requireAdmin, async (req, res) =>{
     try {
         const users = await User.find();
         res.status(200).json({status: "Success", message: "Lista de Usuarios", payload: users});
@@ -21,52 +26,39 @@ usersRouter.get("/", async (req, res) =>{
 usersRouter.post("/", async (req, res) =>{
     try {
         const {username, email, password} = req.body;
+
+        let userRole = "user";
+        if (email.includes("@admin.com")) {
+            userRole = "admin";
+        };
+
         const hashedPassword = await hashPassword(password);
-        const newUser = await User.create({username, email, password: hashedPassword});
+        const newUser = await User.create({username, email, password: hashedPassword, role: userRole});
         res.status(201).json({status: "Success", message: "Usuario creado", payload: `User ${newUser.username} creado`});
     } catch (error) {
         res.status(500).json({status: "Error", message: "Error interno del servidor"});
     }
 });
 
-//Create user - Passport local strategy
-/* usersRouter.post("/", passport.authenticate("localRegister", {session: false}) , async (req, res) =>{
+//Ruta protegida (profile) - Passport JWT strategy
+usersRouter.get("/profile", requireUser, async (req, res) =>{
     try {
-        res.status(201).json({status: "Success", message: "Usuario creado", payload: `User ${req.user.username} creado`});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error interno del servidor"});
-    }
-}); */
-
-//Ruta protegida.
-/* usersRouter.get("/profile", isAuth, async (req, res) =>{
-    try {
-       
-        //const user = req.session?.userInfo; //Pregunto si ya existe la cookie de conexion del cliente
-        //if(!user) return res.status(401).json({status: "Error", message: "Usuario no logueado"});
-        //res.status(200).json({status: "Success", message: "Usuario accediendo a contenido privado porque ya esta logueado", payload: user});
-
-        res.status(200).json({status: "Success", message: "Usuario accediendo a ruta protegida porque ya esta logueado"});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error interno del servidor"});
-    }
-}); */
-
-//Ruta protegida - Passport JWT strategy
-usersRouter.get("/profile", passport.authenticate("jwt", {session: false}), async (req, res) =>{
-    try {
-       
-        //const user = req.session?.userInfo; //Pregunto si ya existe la cookie de conexion del cliente
-        //if(!user) return res.status(401).json({status: "Error", message: "Usuario no logueado"});
-        //res.status(200).json({status: "Success", message: "Usuario accediendo a contenido privado porque ya esta logueado", payload: user});
-
         res.status(200).json({status: "Success", message: "Usuario accediendo a ruta protegida porque ya esta logueado", payload: req.user});
     } catch (error) {
         res.status(500).json({status: "Error", message: "Error interno del servidor"});
     }
 });
 
+//Ruta protegida (delete user) - Passport JWT strategy
+usersRouter.delete("/:id", requireAdmin, async (req, res) =>{
+    try {
+       const user = await User.findByIdAndDelete(req.params.id);
+       if (!user) res.status(404).json({status: "Error", message: "Usuario no existente"});
 
-
+       res.status(200).json({status: "Success", message: "Usuario eliminado"});
+    } catch (error) {
+        res.status(500).json({status: "Error", message: "Error al eliminar el usuario"});
+    }
+});
 
 export default usersRouter;

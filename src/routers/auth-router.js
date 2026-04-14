@@ -35,12 +35,6 @@ authRouter.post("/login", async (req, res) =>{
         const {accessToken, refreshToken} = generateTokens(user);   //Genera los tokens
         res.cookie("refresh", refreshToken, {httpOnly: true, secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }); //Guarda el refresh token en una cookie httpOnly para renovar acceso sin exponerlo al cliente
 
-        //req.session.userInfo = {
-            //id: user._id,
-            //username: user.username
-        //}
-        //res.status(200).json({status: "Success", message: "Session iniciada", payload: req.session.userInfo, token: accessToken});
-
         res.status(200).json({status: "Success", message: "Login exitoso", token: accessToken});
     } catch (error) {
         res.status(500).json({status: "Error", message: "Error interno del servidor"});

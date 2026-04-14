@@ -1,7 +1,6 @@
 import passport from "passport";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-//import { Strategy as LocalStrategy } from "passport-local";
 
 import User from "../models/user-model.js";
 //import { hashPassword } from "../utils/password.js";
@@ -57,33 +56,7 @@ const initializePassport = () => {
             },
         ),
     );
-
-    //Estrategia Local de Registro
-    /* passport.use(
-        "localRegister",
-        new LocalStrategy(
-            {
-                usernameField: "username",
-                passReqToCallback: true     //Para que passport pueda recibir el objeto req
-            },
-            async (req, username, password, done) => {
-                try {
-                    //Verifica si existe el usuario
-                    const user = await User.findOne({ username });
-                    if (user) return done(null, false, { message: "Usuario existente" });   //Verificar luego
-
-                    //Creo el usuario
-                    const hashedPassword = await hashPassword(password);
-                    const newUser = await User.create({username, email: req.body.email, password: hashedPassword});
-
-                    return done(null, newUser);
-                } catch (error) {
-                    return done(error, null);
-                }
-            }
-        )
-    ); */
-
+   
     //Estos metodos son los que serializan y deserealizan al user como una clave de la request: req.user
     passport.serializeUser((user, done) => {
         done(null, user._id);

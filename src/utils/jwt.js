@@ -9,10 +9,10 @@ export const generateTokens = (user) => {
     return {accessToken, refreshToken};
 };
 
-//Metodo para verificar el token cuando el cliente intenta acceder al server. Lo usa el middleware de auth para rutas protegidas
+/* //Metodo para verificar el token cuando el cliente intenta acceder al server. Lo usa el middleware de auth para rutas protegidas
 export const verifyAccessToken = (token) => {
     return jwt.verify(token, env.jwtSecret);
-};
+}; */
 
 //Metodo para verificar el token de refresco. Lo usa el middleware de refresh para verificar el refresh token
 export const verifyRefreshToken = (token) => {
