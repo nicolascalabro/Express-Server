@@ -1,6 +1,6 @@
 import { verifyAccessToken } from "../utils/jwt.js";
 
-//Middelware para verificar el access token. Lo uso en las rutas protegidas, como /profile
+//Middelware para verificar el access token. Lo uso en las rutas protegidas, como /profile (Al agregar authentication con la strategy JWT, este middleware queda sin usuar)
 export const isAuth = (req, res, next) => {
     const authHeaders = req.headers.authorization;
     if(!authHeaders) return res.status(401).json({status: "Error", message: "Usuario no autenticado"});

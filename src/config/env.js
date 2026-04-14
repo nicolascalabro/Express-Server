@@ -8,5 +8,10 @@ export const env = {
     secretCode: process.env.SECRET_CODE,
     uriMongoDB: process.env.URI_MONGODB,
     jwtSecret: process.env.JWT_SECRET,
-    jwtRefreshSecret: process.env.REFRESH_SECRET
+    jwtRefreshSecret: process.env.REFRESH_SECRET,
+    github: {
+        clientID: process.env.GITHUB_CLIENT_ID,
+        secretID: process.env.GITHUB_SECRET_ID,
+        callbackURL: process.env.GITHUB_CALLBACK_URL
+    }
 };

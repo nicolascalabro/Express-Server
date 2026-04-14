@@ -1,6 +1,6 @@
 import { verifyRefreshToken } from "../utils/jwt.js";
 
-//Middelware para verificar el refresh token
+//Middelware para verificar que el refresh token
 export const isRefresh = (req, res, next) => {
     const refreshToken = req.cookies?.refresh;
 

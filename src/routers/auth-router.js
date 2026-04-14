@@ -1,12 +1,25 @@
 import express from "express";
+import passport from "passport";
 
 import User from "../models/user-model.js";
 import { hashPassword, comparePassword } from "../utils/password.js";
 import { generateTokens} from "../utils/jwt.js";
 import { isRefresh } from "../middlewares/refresh-middleware.js";
 
-
 const authRouter = express.Router();
+
+//Login - GitHub strategy
+authRouter.get("/github", passport.authenticate("github", {scope: ["user:email"]}));
+
+//Callback login - GitHub strategy
+authRouter.get("/github/callback", passport.authenticate("github", {failureRedirect: "/auth/login"}), 
+    (req,res) => {
+        //No hay trycatch ni error porque el login ya ha sido exitoso en este punto
+        const {accessToken, refreshToken} = generateTokens(req.user);   //Genera los tokens (el user aca esta en la req)
+        res.cookie("refresh", refreshToken, {httpOnly: true, secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }); //Guarda el refresh token en una cookie httpOnly para renovar acceso sin exponerlo al cliente
+        res.status(200).json({status: "Success", message: "Login con GitHub exitoso", token: accessToken});
+    }
+);
 
 //Login
 authRouter.post("/login", async (req, res) =>{
@@ -51,12 +64,13 @@ authRouter.get("/logout", async (req, res) =>{
     }
 });
 
-//Refresh: El middleware verifica que el refresh no se haya vencido, y luego en el endpoint se generan ambos tokens nuevamente como en el login
+//Refresh
 authRouter.post("/refresh", isRefresh, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         if(!user) return res.status(404).json({status: "Error", message: "Usuario no encontrado"});
         
+        //Se generan ambos tokens nuevamente como en el login
         const {accessToken, refreshToken} = generateTokens(user);   //Genera los tokens
         res.cookie("refresh", refreshToken, {httpOnly: true, secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }); //Guarda el refresh token en una cookie httpOnly para renovar acceso sin exponerlo al cliente
 
