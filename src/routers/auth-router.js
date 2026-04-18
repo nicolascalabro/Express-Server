@@ -2,18 +2,17 @@ import express from "express";
 import passport from "passport";
 
 import User from "../models/user-model.js";
-import { hashPassword, comparePassword } from "../utils/password.js";
+import { comparePassword } from "../utils/password.js";
 import { generateTokens} from "../utils/jwt.js";
 import { isRefresh } from "../middlewares/refresh-middleware.js";
 
 const authRouter = express.Router();
 
 //Login - GitHub strategy
-authRouter.get("/github", passport.authenticate("github", {scope: ["user:email"]}));
+authRouter.get("/github", passport.authenticate("github", {scope: ["user:email"], session: false}));
 
 //Callback login - GitHub strategy
-authRouter.get("/github/callback", passport.authenticate("github", {failureRedirect: "/auth/login"}), 
-    (req,res) => {
+authRouter.get("/github/callback", passport.authenticate("github", {failureRedirect: "/auth/login", session: false}), (req,res) => {
         //No hay trycatch ni error porque el login ya ha sido exitoso en este punto
         const {accessToken, refreshToken} = generateTokens(req.user);   //Genera los tokens (el user aca esta en la req)
         res.cookie("refresh", refreshToken, {httpOnly: true, secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 }); //Guarda el refresh token en una cookie httpOnly para renovar acceso sin exponerlo al cliente
@@ -47,6 +46,7 @@ authRouter.get("/logout", async (req, res) =>{
         const refreshToken = req.cookies?.refresh;
         if(!refreshToken) return res.status(401).json({status: "Error", message: "No hay una sesion JWT activa"});
 
+        //Backend borra el refresh token y el frontend deberia eliminar el accessToken
         res.clearCookie("refresh", {
             httpOnly: true,
             secure: false

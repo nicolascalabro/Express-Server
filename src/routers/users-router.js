@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 
 import User from "../models/user-model.js";
-import { hashPassword, comparePassword } from "../utils/password.js";
+import { hashPassword } from "../utils/password.js";
 import { authorizeRoles } from "../middlewares/auth-middleware.js";
 
 const usersRouter = express.Router();
@@ -12,7 +12,7 @@ const authenticate = passport.authenticate("jwt", {session: false});    //Usuari
 const requireAdmin = [authenticate, authorizeRoles([])];                //Usuario autenticado y con rol admin
 const requireUser = [authenticate, authorizeRoles(["user"])];           //Usuario autenticado y con rol user
 
-//Get all users
+//Ruta protegida (Get all users) - Passport JWT strategy
 usersRouter.get("/", requireAdmin, async (req, res) =>{
     try {
         const users = await User.find();
@@ -43,7 +43,7 @@ usersRouter.post("/", async (req, res) =>{
 //Ruta protegida (profile) - Passport JWT strategy
 usersRouter.get("/profile", requireUser, async (req, res) =>{
     try {
-        res.status(200).json({status: "Success", message: "Usuario accediendo a ruta protegida porque ya esta logueado", payload: req.user});
+        res.status(200).json({status: "Success", message: "Bienvenido a su perfil", payload: req.user});
     } catch (error) {
         res.status(500).json({status: "Error", message: "Error interno del servidor"});
     }

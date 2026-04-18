@@ -3,7 +3,6 @@ import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 
 import User from "../models/user-model.js";
-//import { hashPassword } from "../utils/password.js";
 import { env } from "../config/env.js";
 
 const initializePassport = () => {
@@ -23,7 +22,7 @@ const initializePassport = () => {
                     let user = await User.findOne({email});                                 //Lo busca en la base de datos
                     
                     if (!user) {
-                        user = await User.create({username: `${profile.username}`, email: email, password: "password_generico"});    
+                        user = await User.create({username: profile.username, email: email, password: "password_generico"});    
                     };
                     return done(null, user);    //El primer parametro es el error, como aca no hay se pone null
                 } catch (error) {
@@ -57,18 +56,17 @@ const initializePassport = () => {
         ),
     );
    
-    //Estos metodos son los que serializan y deserealizan al user como una clave de la request: req.user
-    passport.serializeUser((user, done) => {
+    /* passport.serializeUser((user, done) => {
         done(null, user._id);
-    });
-    passport.deserializeUser(async (id, done) => {
+    }); */
+    /* passport.deserializeUser(async (id, done) => {
         try {
             const user = await User.findById(id).select("-password");
             done(null, user);
         } catch (error) {
             done(error, null);
         }
-    });
+    }); */
 };
 
 export default initializePassport;

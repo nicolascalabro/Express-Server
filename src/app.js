@@ -23,18 +23,18 @@ const app = express();
     saveUninitialized: false         
 }; */
 
-const sessionConfig = {
+/* const sessionConfig = {
     secret: env.secretCode,                     //Clave para firmar la cookie y evitar manipulaciones del lado del cliente
     resave: false,                              //False: no guarda la sesion si no hubo cambios, lo que optimiza rendimiento
     saveUninitialized: false         
-};
+}; */
 
 //------ Configuracion middlewares de express ------
 app.use(express.json());                        //Permite que el servidor entienda JSON en el body de una request.
 app.use(express.static("public"));              //Le dice a Express que sirva archivos estaticos desde la carpeta public.
 app.use(express.urlencoded({extended: true}));  //Permite leer datos enviados desde formularios HTML tradicionales
 
-//------ Configuracion de handlebars ------
+//------ Configuracion de cookies ------
 //app.engine("handlebars", engine());           //Habilita el motor handlebars
 //app.set("view engine", "handlebars");         //Setea handlebars como motor de vistas, porque podemos tener varios
 //app.set("views", "./src/views");              //Setea la ruta de las vistas
@@ -43,12 +43,12 @@ app.use(express.urlencoded({extended: true}));  //Permite leer datos enviados de
 app.use(cookieParser());
 
 //------ Sessions ------
-app.use(session(sessionConfig));              //Session crea una cookie con un id que identifica al cliente
+//app.use(session(sessionConfig));                //Session crea una cookie con un id que identifica al cliente
 
 //------ Passport ------
 initializePassport();
 app.use(passport.initialize());                 
-app.use(passport.session());                    //Passport necesita trabajar con sessions
+//app.use(passport.session());                
 
 //------ Routers ------
 app.use("/api/users", usersRouter);

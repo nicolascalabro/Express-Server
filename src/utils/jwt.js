@@ -4,7 +4,7 @@ import { env } from "../config/env.js";
 //Metodo para generar Tokens. Lo uso en la ruta /login
 export const generateTokens = (user) => {
     const accessToken = jwt.sign({id: user._id, username: user.username}, env.jwtSecret, {expiresIn: "10m"});  //Genera un token de acceso con su firma
-    const refreshToken = jwt.sign({id: user._id}, env.jwtRefreshSecret, {expiresIn: "7d"});                     //Genera un token de respaldo con su firma
+    const refreshToken = jwt.sign({id: user._id}, env.jwtRefreshSecret, {expiresIn: "7d"});                    //Genera un token de respaldo con su firma
 
     return {accessToken, refreshToken};
 };
