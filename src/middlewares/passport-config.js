@@ -37,8 +37,9 @@ const initializePassport = () => {
         "jwt",
         new JwtStrategy(
             {
-                //Extrae el token y lo valida
-                jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),   
+                //Extrae el token y lo valida: lo puede extraer desde una cookie o desde el auth header
+                //jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),   
+                jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor, ExtractJwt.fromAuthHeaderAsBearerToken()]), //fromExtractor me permite pasarle distintos metodos para extraer el token  
                 secretOrKey: env.jwtSecret,
             },
             async (jwt_payload, done) => {
@@ -68,5 +69,14 @@ const initializePassport = () => {
         }
     }); */
 };
+
+//Funcion local para extraer el token desde la cookie
+const cookieExtractor = (req) => {
+    let token = null;
+    if (req && req.cookies){
+        token = req.cookies["accessToken"];
+    }
+    return token;
+}
 
 export default initializePassport;

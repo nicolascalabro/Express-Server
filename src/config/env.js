@@ -1,7 +1,11 @@
 import dotenv from "dotenv";
 
+const environment = process.env.NODE_ENV || "development"
+
 //Inicializacion de variables de entorno
-dotenv.config();
+dotenv.config({
+    path: environment === "production" ? ".env-production" : ".env"
+});
 
 export const env = {
     port: process.env.PORT,
@@ -13,5 +17,6 @@ export const env = {
         clientID: process.env.GITHUB_CLIENT_ID,
         secretID: process.env.GITHUB_SECRET_ID,
         callbackURL: process.env.GITHUB_CALLBACK_URL
-    }
+    },
+    mode: environment
 };

@@ -2,7 +2,7 @@ import { verifyRefreshToken } from "../utils/jwt.js";
 
 //Middelware para verificar que el refresh token
 export const isRefresh = (req, res, next) => {
-    const refreshToken = req.cookies?.refresh;
+    const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
         return res.status(401).json({status: "Error", message: "Refresh token no encontrado"});

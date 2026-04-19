@@ -1,4 +1,4 @@
-
+//Roles
 export const authorizeRoles = (roles) => {
     return (req, res, next) => {
         //Verifica que el usuario ya haya sido autenticado antes
