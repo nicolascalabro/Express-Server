@@ -14,68 +14,55 @@ authRouter.get("/github", passport.authenticate("github", {scope: ["user:email"]
 
 //Callback login - GitHub strategy
 authRouter.get("/github/callback", passport.authenticate("github", {failureRedirect: "/auth/login", session: false}), (req,res) => {
-        //No hay trycatch ni error porque el login ya ha sido exitoso en este punto
-        const {accessToken, refreshToken} = generateTokens(req.user);
-        //Se guardan los tokens en cookies. El de acceso lo extrae Passport desde la cookie, de esta forma es mas seguro
-        res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 10 * 60 * 1000 });
-        res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
-        res.status(200).json({status: "Success", message: "Login con GitHub exitoso"});
-    }
-);
+    //No hay trycatch ni error porque el login ya ha sido exitoso en este punto
+    const {accessToken, refreshToken} = generateTokens(req.user);
+    //Se guardan los tokens en cookies. El de acceso lo extrae Passport desde la cookie, de esta forma es mas seguro
+    res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 10 * 60 * 1000 });
+    res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
+    res.status(200).json({status: "Success", message: "Login con GitHub exitoso"});
+});
 
 //Login
 authRouter.post("/login", async (req, res) =>{
-    try {
-        const {username, password} = req.body;
+    const {username, password} = req.body;
 
-        const user = await User.findOne({username});
-        if(!user) return res.status(404).json({status: "Error", message: "Usuario no encontrado"});
+    const user = await User.findOne({username});
+    if(!user) return res.status(404).json({status: "Error", message: "Usuario no encontrado"});
 
-        const isValidPassword = await comparePassword(password, user.password);
-        if(!isValidPassword) return res.status(404).json({status: "Error", message: "Password incorrecto"});
+    const isValidPassword = await comparePassword(password, user.password);
+    if(!isValidPassword) return res.status(404).json({status: "Error", message: "Password incorrecto"});
         
-        const {accessToken, refreshToken} = generateTokens(user);
-        //Se guardan los tokens en cookies. El de acceso lo extrae Passport desde la cookie, de esta forma es mas seguro
-        res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 10 * 60 * 1000 });
-        res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
+    const {accessToken, refreshToken} = generateTokens(user);
+    //Se guardan los tokens en cookies. El de acceso lo extrae Passport desde la cookie, de esta forma es mas seguro
+    res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 10 * 60 * 1000 });
+    res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-        res.status(200).json({status: "Success", message: "Login exitoso"});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error interno del servidor"});
-    }
+    res.status(200).json({status: "Success", message: "Login exitoso"});
 });
 
 //Logout
 authRouter.get("/logout", async (req, res) =>{
-    try {
-        const refreshToken = req.cookies?.refreshToken;
-        if(!refreshToken) return res.status(401).json({status: "Error", message: "No hay una sesion iniciada"});
+    const refreshToken = req.cookies?.refreshToken;
+    if(!refreshToken) return res.status(401).json({status: "Error", message: "No hay una sesion iniciada"});
 
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
 
-        res.status(200).json({status: "Success", message: "Logout exitoso"});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error interno del servidor"});
-    }
+    res.status(200).json({status: "Success", message: "Logout exitoso"});
 });
 
 //Refresh
 authRouter.post("/refresh", isRefresh, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-        if(!user) return res.status(404).json({status: "Error", message: "Usuario no encontrado"});
+    const user = await User.findById(req.user.id);
+    if(!user) return res.status(404).json({status: "Error", message: "Usuario no encontrado"});
         
-        //Se generan ambos tokens nuevamente como en el login
-        const {accessToken, refreshToken} = generateTokens(user);
-        //Se guardan los tokens en cookies. El de acceso lo extrae Passport desde la cookie, de esta forma es mas seguro
-        res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 10 * 60 * 1000 });
-        res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
+    //Se generan ambos tokens nuevamente como en el login
+    const {accessToken, refreshToken} = generateTokens(user);
+    //Se guardan los tokens en cookies. El de acceso lo extrae Passport desde la cookie, de esta forma es mas seguro
+    res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 10 * 60 * 1000 });
+    res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-        res.status(200).json({status: "Success", message: "Token de acceso renovado"});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error interno del servidor"});
-    }
+    res.status(200).json({status: "Success", message: "Token de acceso renovado"});   
 });
 
 export default authRouter;

@@ -14,51 +14,34 @@ const requireUser = [authenticate, authorizeRoles(["user"])];           //Usuari
 
 //Ruta protegida (Get all users) - Passport JWT strategy
 usersRouter.get("/", requireAdmin, async (req, res) =>{
-    try {
-        const users = await User.find();
-        res.status(200).json({status: "Success", message: "Lista de Usuarios", payload: users});
-    } catch (error) {
-        res.status(404).json({status: "Error", message: "Usuario no existente"});
-    }
+    const users = await User.find();
+    res.status(200).json({status: "Success", message: "Lista de Usuarios", payload: users});
 });
 
 //Create user
 usersRouter.post("/", async (req, res) =>{
-    try {
-        const {username, email, password} = req.body;
+    const {username, email, password} = req.body;
 
-        let userRole = "user";
-        if (email.includes("@admin.com")) {
-            userRole = "admin";
-        };
+    let userRole = "user";
+    if (email.includes("@admin.com")) {
+        userRole = "admin";
+    };
 
-        const hashedPassword = await hashPassword(password);
-        const newUser = await User.create({username, email, password: hashedPassword, role: userRole});
-        res.status(201).json({status: "Success", message: "Usuario creado", payload: `User ${newUser.username} creado`});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error interno del servidor"});
-    }
+    const hashedPassword = await hashPassword(password);
+    const newUser = await User.create({username, email, password: hashedPassword, role: userRole});
+    res.status(201).json({status: "Success", message: "Usuario creado", payload: `User ${newUser.username} creado`});
 });
 
 //Ruta protegida (profile) - Passport JWT strategy
 usersRouter.get("/profile", requireUser, async (req, res) =>{
-    try {
-        res.status(200).json({status: "Success", message: "Bienvenido a su perfil", payload: req.user});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error interno del servidor"});
-    }
+    res.status(200).json({status: "Success", message: "Bienvenido a su perfil", payload: req.user});
 });
 
 //Ruta protegida (delete user) - Passport JWT strategy
 usersRouter.delete("/:id", requireAdmin, async (req, res) =>{
-    try {
-       const user = await User.findByIdAndDelete(req.params.id);
-       if (!user) res.status(404).json({status: "Error", message: "Usuario no existente"});
-
-       res.status(200).json({status: "Success", message: "Usuario eliminado"});
-    } catch (error) {
-        res.status(500).json({status: "Error", message: "Error al eliminar el usuario"});
-    }
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) res.status(404).json({status: "Error", message: "Usuario no existente"});
+    res.status(200).json({status: "Success", message: "Usuario eliminado"});
 });
 
 export default usersRouter;

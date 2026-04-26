@@ -9,6 +9,7 @@ import usersRouter from "./routers/users-router.js";
 import authRouter from "./routers/auth-router.js";
 import connectMongoDB from "./config/db.js";
 import initializePassport from "./middlewares/passport-config.js";
+import { globalErrorHandler } from "./middlewares/error-handler.js";
 
 const app = express();
 
@@ -53,6 +54,15 @@ app.use(passport.initialize());
 //------ Routers ------
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
+
+//------ Recurso no encontrado ------
+app.use((req, res) => {
+    res.status(404).json({status: "Error", message: `La ruta ${req.method} ${req.originalUrl} no existe en el servidor`});
+});
+
+//------ Manejador de errors global ------
+app.use(globalErrorHandler);
+
 
 //------ Conexion con MongoDB ------
 connectMongoDB();
