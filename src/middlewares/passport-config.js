@@ -1,11 +1,43 @@
 import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 
 import User from "../models/user-model.js";
+import { comparePassword } from "../utils/password.js";
 import { env } from "../config/env.js";
 
 const initializePassport = () => {
+    // Estrategia local
+    passport.use(
+        "local",
+        new LocalStrategy(
+            {
+                usernameField: "username",
+                passwordField: "password",
+                session: false
+            },
+            async (username, password, done) => {
+                try {
+                    const user = await User.findOne({ username });
+
+                    if (!user) {
+                        return done(null, false, { message: "Usuario no encontrado" });
+                    }
+
+                    const isValidPassword = await comparePassword(password, user.password);
+
+                    if (!isValidPassword) {
+                        return done(null, false, { message: "Password incorrecto" });
+                    }
+
+                    return done(null, user);
+                } catch (error) {
+                    return done(error, false);
+                }
+            }
+        )
+    );
 
     //Estrategia de GitHub
     passport.use(

@@ -15,7 +15,7 @@ const requireUser = [authenticate, authorizeRoles(["user"])];           //Usuari
 usersRouter.get("/", requireAdmin, getAllUsers);
 
 //Create user
-usersRouter.post("/", createUser);
+usersRouter.post("/register", createUser);
 
 //Ruta protegida (profile) - Passport JWT strategy
 usersRouter.get("/profile", requireUser, getProfile);

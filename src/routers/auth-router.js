@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 
 import { isRefresh } from "../middlewares/refresh-middleware.js";
-import { githubLogin, login, logout, refresh } from "../controllers/auth-controller.js";
+import { githubLogin, localLogin, logout, refresh } from "../controllers/auth-controller.js";
 
 const authRouter = express.Router();
 
@@ -12,8 +12,8 @@ authRouter.get("/github", passport.authenticate("github", {scope: ["user:email"]
 //Callback login - GitHub strategy
 authRouter.get("/github/callback", passport.authenticate("github", {failureRedirect: "/auth/login", session: false}), githubLogin);
 
-//Login
-authRouter.post("/login", login);
+//Login - Local strategy
+authRouter.post("/login", localLogin);
 
 //Logout
 authRouter.get("/logout", logout);
