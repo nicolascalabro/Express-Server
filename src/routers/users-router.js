@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 
 import { authorizeRoles } from "../middlewares/auth-middleware.js";
-import { getAllUsers, createUser, getProfile, deleteUser } from "../controllers/users-controller.js";
+import { getAllUsers, createUser, getProfile, deleteUser, getPremiumContent } from "../controllers/users-controller.js";
 
 const usersRouter = express.Router();
 
@@ -22,5 +22,8 @@ usersRouter.get("/profile", requireUser, getProfile);
 
 //Ruta protegida (delete user) - Passport JWT strategy
 usersRouter.delete("/:id", requireAdmin, deleteUser);
+
+//Ruta protegida (admin) - Passport JWT strategy
+usersRouter.get("/admin", requireAdmin, getPremiumContent);
 
 export default usersRouter;

@@ -28,3 +28,7 @@ export const deleteUser = async (req, res) =>{
     if (!user) res.status(404).json({status: "Error", message: "Usuario no existente"});
     res.status(200).json({status: "Success", message: "Usuario eliminado"});
 };
+
+export const getPremiumContent = async (req, res) =>{
+    res.status(200).json({status: "Success", message: "Bienvenido al contenido premium"});
+};
