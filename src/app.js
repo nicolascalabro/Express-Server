@@ -63,7 +63,6 @@ app.use((req, res) => {
 //------ Manejador de errors global ------
 app.use(globalErrorHandler);
 
-
 //------ Conexion con MongoDB ------
 connectMongoDB();
 
