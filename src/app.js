@@ -52,8 +52,8 @@ app.use(passport.initialize());
 //app.use(passport.session());                
 
 //------ Routers ------
-app.use("/api/users", usersRouter);
-app.use("/api/auth", authRouter);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/auth", authRouter);
 
 //------ Recurso no encontrado ------
 app.use((req, res) => {
