@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 
 import { authorizeRoles } from "../middlewares/auth-middleware.js";
-import { getAllUsers, createUser, getProfile, deleteUser, getPremiumContent } from "../controllers/users-controller.js";
+import { getAllUsers, createUser, getProfile, deleteUser, getPremiumContent, createFakeUsers } from "../controllers/users-controller.js";
 
 const usersRouter = express.Router();
 
@@ -16,6 +16,9 @@ usersRouter.get("/", requireAdmin, getAllUsers);
 
 //Create user
 usersRouter.post("/register", createUser);
+
+//Create user
+usersRouter.get("/createFakeUsers/:quantity", createFakeUsers);
 
 //Ruta protegida (profile) - Passport JWT strategy
 usersRouter.get("/profile", requireUser, getProfile);

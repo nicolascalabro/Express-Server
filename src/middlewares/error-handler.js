@@ -1,5 +1,7 @@
+import { logger } from "../utils/logger.js";
+
 export const globalErrorHandler = (err, req, res, next) => {
-  console.error(`[ERROR] en ${req.method} ${req.originalUrl} - ${err}`);
+  logger.error(`[ERROR] en ${req.method} ${req.originalUrl} - ${err}`);
   const statusCode = err.status || 500;
 
   const response = {

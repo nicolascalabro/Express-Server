@@ -3,6 +3,7 @@ import passport from "passport";
 import User from "../models/user-model.js";
 import { generateTokens} from "../utils/jwt.js";
 import { env } from "../config/env.js";
+import { logger } from "../utils/logger.js";
 
 export const githubLogin = (req, res) => {
     const {accessToken, refreshToken} = generateTokens(req.user);
@@ -11,6 +12,7 @@ export const githubLogin = (req, res) => {
     res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 60 * 60 * 1000 });
     res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
 
+    logger.info("Usuario realiza loggin con Github");
     res.status(200).json({status: "Success", message: "Login con GitHub exitoso"});
 };
 
@@ -25,6 +27,7 @@ export const localLogin = (req, res, next) => {
         res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 60 * 60 * 1000 });
         res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
 
+        logger.info("Usuario realiza loggin local");
         res.status(200).json({status: "Success", message: "Login exitoso"});
     })(req, res, next);
 };
@@ -36,6 +39,7 @@ export const logout = async (req, res) =>{
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
 
+    logger.info("Usuario realiza logout");
     res.status(200).json({status: "Success", message: "Logout exitoso"});
   };
 
@@ -50,5 +54,6 @@ export const refresh = async (req, res) => {
     res.cookie("accessToken", accessToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 60 * 60 * 1000 });
     res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: env.mode === "production", sameSite: "lax", maxAge: 7 * 24 * 60 * 60 * 1000 });
 
+    logger.info("Se realiza refresh de tokens");
     res.status(200).json({status: "Success", message: "Token de acceso renovado"});   
 };

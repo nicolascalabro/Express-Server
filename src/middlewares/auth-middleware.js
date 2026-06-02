@@ -1,3 +1,5 @@
+import { logger } from "../utils/logger.js";
+
 //Roles
 export const authorizeRoles = (roles) => {
     return (req, res, next) => {
@@ -7,6 +9,7 @@ export const authorizeRoles = (roles) => {
         //Verifica si el rol del usuario es admin, o si en el array que recibe esta incluido el rol del usuario
         if (req.user.role === "admin" || roles.includes(req.user.role)) return next();
 
+        logger.warn("Usuario sin permisos");
         return res.status(403).json({ status: "Error", message: "El usuario no tiene los permisos suficientes" });
     };
 };

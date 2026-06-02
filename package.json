@@ -5,13 +5,18 @@
   "type": "module",
   "scripts": {
     "start": "node ./src/app.js",
-    "dev": "cross-env NODE_ENV=development nodemon ./src/app.js"
+    "dev": "cross-env NODE_ENV=development nodemon ./src/app.js",
+    "prod": "cross-env NODE_ENV=production node ./src/app.js"
   },
-  "keywords": ["e-commerce", "backend"],
+  "keywords": [
+    "e-commerce",
+    "backend"
+  ],
   "author": "Nicolas Calabro",
   "license": "ISC",
   "description": "Servidor Express Proyecto Final Desarrollo Backend II",
   "dependencies": {
+    "@faker-js/faker": "^9.9.0",
     "bcrypt": "^6.0.0",
     "connect-mongo": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -25,6 +30,7 @@
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "winston": "^3.19.0"
   }
 }
