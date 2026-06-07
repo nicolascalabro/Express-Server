@@ -3,6 +3,8 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 //import MongoStore from "connect-mongo";
 import passport from "passport";
+import cluster from "cluster";
+import os from "os";
 
 import { env } from "./config/env.js";
 import usersRouter from "./routers/users-router.js";
@@ -10,6 +12,7 @@ import authRouter from "./routers/auth-router.js";
 import connectMongoDB from "./config/db.js";
 import initializePassport from "./middlewares/passport-config.js";
 import { globalErrorHandler } from "./middlewares/error-handler.js";
+import { logger } from "./utils/logger.js";
 
 const app = express();
 
@@ -66,7 +69,21 @@ app.use(globalErrorHandler);
 //------ Conexion con MongoDB ------
 connectMongoDB();
 
-//------ Server listen ------
-app.listen(env.port, ()=>{
-    console.log("Servidor iniciado");
-});
+if (cluster.isPrimary){
+    const cpus = os.cpus().length;
+    logger.info("Proceso primario con id: " + process.pid);
+
+    for(let i = 0; i < cpus; i++){
+        cluster.fork();
+    }
+
+    cluster.on("exit", (worker, code)=>{
+        logger.warn("El proceso hijo con id: " + worker.pid + "se elimino, codigo de error: " + code);
+        cluster.fork();
+    });
+}
+else{
+    app.listen(env.port, ()=>{     
+        logger.info("Servidor iniciado por proceso hijo: " + process.pid);
+    });
+};
