@@ -69,6 +69,11 @@ app.use(globalErrorHandler);
 //------ Conexion con MongoDB ------
 connectMongoDB();
 
+app.get("/",(req,res)=>{
+    
+    res.json({status:"success"})
+})
+
 if (cluster.isPrimary){
     const cpus = os.cpus().length;
     logger.info("Proceso primario con id: " + process.pid);
